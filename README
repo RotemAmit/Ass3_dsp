@@ -1,0 +1,52 @@
+1.	Design – 
+•	Step 1 – Arrange the data – By MapReduce
+In this job we take the corpus and find all the relations between words (features and lexemes). The mapper combines the related features and lexemes, while the reducer filters the lexemes that do not belong to the golden standard and create the relevant & organized corpus. 
+In this stage we also calculate the amount of each feature, all the features, and all the lexemes. 
+The output of this job is written to 2 folders: F for all the features and S for the sorted corpus. 
+•	Step 2 – Find the 1000 most common Features – By MapReduce
+This job takes the 'Features' files created in the first step. The files contain the name and the occurrences of each feature. The reduce selects the words that appear several times that located in places 101-1101 and gives them a number representing their future vector location. Those selected words and their future location will be in the output file of this step.
+•	Step 3 – Measures of association with context – By MapReduce 
+The Mapper collects the sorted corpus files from Step 1 and pass it to the reducer. 
+The reducer saves the 1000 chosen features locally, so it could know their position. 
+For each lexeme in the sorted corpus, the reduce creates a vector and add each occurrence to the vector by the feature place. In addition, it counts all the occurrence of each lexemes. By the end of this step, each lexeme is represented by its own vector. 
+Each vector contains 4*1000=4000 cells. 
+•	Step 4 – Measures of vector similarity – By MapReduce
+By using Fuzzy-Join, we gather each two vectors to 1 vector similarity, and calculate the 24 components of each vector according to the article. 
+The mapper gathers the vectors of each 2 words that appear together in the GS. 
+The Reducer calculate the 24 components. 
+•	Step 5 – Weka – Not by MapReduce
+Insert the result from Step 4 to the Weka, and write the results to the Final file. 
+
+2.	Communication – sent from the mappers to the reducers
+•	10% of the input
+Step  Number of Key-Value pairs   Size(byte)
+1	    37465921	                  806208331
+2	    488387	                    9960670
+3	    15319607	                  258992355
+4	    24553	                      786114990
+
+
+
+
+
+•	100% of the input
+Step	Number of Key-Value pairs	  Size (byte)
+1	    669573779	                  16594581234
+2	    2072481	                    43908775
+3	    288899979	                  5455861192
+4	    25887	                      828828285
+
+3.	Results
+•	10% of the input – 
+Correctly Classified Instances: 88.33015432633952%
+Incorrectly Classified Instances 11.669845673660483%
+F1: 0.9376447697581766 
+Precision: 0.9027653880463872 
+Recall: 0.9753276792598303
+
+•	100% of the input – 
+Correctly Classified Instances: 89.57504873294347%
+Incorrectly Classified Instances 10.42495126705653%
+F1: 0.9449907426455462 
+Precision: 0.8977485928705441 
+Recall: 0.9974811083123426
